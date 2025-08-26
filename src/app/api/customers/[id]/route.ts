@@ -8,7 +8,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { id } = params; // 👈 params is directly available here
+  const { id } = await params;
 
   if (!id) {
     return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
@@ -35,10 +35,10 @@ export async function DELETE(
 // ✅ GET /api/customers/[id]
 export async function GET(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = context.params; // ✅ get id from params
+    const { id } = await params; // ✅ get id from params
     await connectDB();
 
     const customer = await Customer.findById(id);
