@@ -6,7 +6,16 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Bell, User, Phone, MapPin, CreditCard, Calendar, DollarSign } from "lucide-react";
+import {
+  ArrowLeft,
+  Bell,
+  User,
+  Phone,
+  MapPin,
+  CreditCard,
+  Calendar,
+  DollarSign,
+} from "lucide-react";
 
 type CustomerType = {
   _id: string;
@@ -23,10 +32,17 @@ type CustomerType = {
   __v: number;
 };
 
-export default async function CustomerPage({ params }: { params: { id: string } }) {
+export default async function CustomerPage({
+  params,
+}: {
+  params: Promise<{ id: string }>; // 👈 params is a Promise
+}) {
+  const { id } = await params; // 👈 Await it here
   await connectDB();
-  const result = await Customer.findById(params.id).lean();
-  const customer: CustomerType | null = result && !Array.isArray(result) ? (result as CustomerType) : null;
+
+  const result = await Customer.findById(id).lean();
+  const customer: CustomerType | null =
+    result && !Array.isArray(result) ? (result as CustomerType) : null;
 
   if (!customer) return notFound();
 
@@ -44,17 +60,16 @@ export default async function CustomerPage({ params }: { params: { id: string } 
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Back Button */}
-          <Button variant="ghost" asChild>
-            <Link href="/customers">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Customers
-            </Link>
-        
-          </Button>
-          {isReminderDue(customer.reminderDate) && (
-            <Badge variant="destructive">Reminder Due</Badge>
-          )}
-        </div>
+        <Button variant="ghost" asChild>
+          <Link href="/customers">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Customers
+          </Link>
+        </Button>
+
+        {isReminderDue(customer.reminderDate) && (
+          <Badge variant="destructive">Reminder Due</Badge>
+        )}
 
         {/* Customer Card */}
         <Card>
@@ -120,12 +135,18 @@ export default async function CustomerPage({ params }: { params: { id: string } 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="font-medium text-muted-foreground">Increase Rate</p>
-                  <p className="text-xl font-semibold">{customer.increasePercentage}%</p>
+                  <p className="text-xl font-semibold">
+                    {customer.increasePercentage}%
+                  </p>
                 </div>
                 <div>
                   <p className="font-medium text-muted-foreground">New Rent</p>
                   <p className="text-xl font-semibold text-primary">
-                    ₹{calculateNewRent(customer.currentRent, customer.increasePercentage).toFixed(2)}
+                    ₹
+                    {calculateNewRent(
+                      customer.currentRent,
+                      customer.increasePercentage
+                    ).toFixed(2)}
                   </p>
                 </div>
               </div>
@@ -141,12 +162,20 @@ export default async function CustomerPage({ params }: { params: { id: string } 
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p className="font-medium text-muted-foreground">Years of Engagement</p>
-                <p className="text-2xl font-bold">{customer.yearsOfEngagement} years</p>
+                <p className="font-medium text-muted-foreground">
+                  Years of Engagement
+                </p>
+                <p className="text-2xl font-bold">
+                  {customer.yearsOfEngagement} years
+                </p>
               </div>
               <div>
-                <p className="font-medium text-muted-foreground">Years Until Increase</p>
-                <p className="text-xl font-semibold">{customer.yearsUntilIncrease} years</p>
+                <p className="font-medium text-muted-foreground">
+                  Years Until Increase
+                </p>
+                <p className="text-xl font-semibold">
+                  {customer.yearsUntilIncrease} years
+                </p>
               </div>
               <div>
                 <p className="font-medium text-muted-foreground">Reminder Date</p>
@@ -158,5 +187,6 @@ export default async function CustomerPage({ params }: { params: { id: string } 
           </Card>
         </div>
       </div>
+    </div>
   );
 }

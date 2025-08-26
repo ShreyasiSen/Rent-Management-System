@@ -4,17 +4,22 @@ import Customer from "@/models/Customer";
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } } // ✅ context object
 ) {
   await connectDB();
-  await Customer.findByIdAndDelete(params.id);
+  const { id } = context.params; // ✅ extract id
+  await Customer.findByIdAndDelete(id);
   return NextResponse.json({ message: "Customer deleted" });
 }
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  req: Request,
+  context: { params: { id: string } } // ✅ context object
+) {
   try {
     await connectDB();
-    const customer = await Customer.findById(params.id);
+    const { id } = context.params; // ✅ extract id
+    const customer = await Customer.findById(id);
 
     if (!customer) {
       return NextResponse.json({ error: "Customer not found" }, { status: 404 });
@@ -22,6 +27,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 
     return NextResponse.json(customer);
   } catch (err) {
+    console.error(err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
