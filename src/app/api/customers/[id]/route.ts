@@ -3,8 +3,8 @@ import { connectDB } from "@/lib/mongodb";
 import Customer from "@/models/Customer";
 
 // ✅ DELETE /api/customers/[id]
-export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  const { id } = await context.params;
+export async function DELETE(request: NextRequest, context: { params: { id: string } }) {
+  const { id } = context.params;
   if (!id) {
     return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
   }
@@ -16,7 +16,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
       return NextResponse.json({ error: "Customer not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ message: "Customer deleted successfully" });
+  return NextResponse.json({ message: "Customer deleted successfully" }, { status: 200 });
   } catch (err) {
     console.error("DELETE error:", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
@@ -24,8 +24,8 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
 }
 
 // ✅ GET /api/customers/[id]
-export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  const { id } = await context.params;
+export async function GET(request: NextRequest, context: { params: { id: string } }) {
+  const { id } = context.params;
   try {
     await connectDB();
     const customer = await Customer.findById(id);
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
       return NextResponse.json({ error: "Customer not found" }, { status: 404 });
     }
 
-    return new Response(JSON.stringify(customer), { status: 200 });
+  return NextResponse.json(customer, { status: 200 });
   } catch (err) {
     console.error("GET error:", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
