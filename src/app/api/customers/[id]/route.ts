@@ -1,16 +1,15 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Customer from "@/models/Customer";
 
 // ✅ DELETE /api/customers/[id]
-export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  const { id } = params;
+  if (!id) {
+    return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
+  }
   try {
     await connectDB();
-    const { id } = params;
-
     const deletedCustomer = await Customer.findByIdAndDelete(id);
 
     if (!deletedCustomer) {
@@ -25,14 +24,10 @@ export async function DELETE(
 }
 
 // ✅ GET /api/customers/[id]
-export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+  const { id } = params;
   try {
     await connectDB();
-    const { id } = params;
-
     const customer = await Customer.findById(id);
 
     if (!customer) {
