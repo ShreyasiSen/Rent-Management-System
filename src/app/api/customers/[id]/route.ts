@@ -4,12 +4,8 @@ import Customer from "@/models/Customer";
 
 
 // ✅ DELETE /api/customers/[id]
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id } = await params;
-
+export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
   if (!id) {
     return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
   }
@@ -33,12 +29,9 @@ export async function DELETE(
 }
 
 // ✅ GET /api/customers/[id]
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
   try {
-    const { id } = await params; // ✅ get id from params
     await connectDB();
 
     const customer = await Customer.findById(id);
@@ -46,10 +39,7 @@ export async function GET(
     if (!customer) {
       return NextResponse.json({ error: "Customer not found" }, { status: 404 });
     }
-
-    return NextResponse.json(customer, { status: 200 });
-  } catch (err) {
-    console.error("GET error:", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+   return new Response(JSON.stringify(customer), { status: 200 });
+  } catch (err) {    console.error("GET error:", err);    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
