@@ -43,3 +43,4 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
   } catch (err) {    console.error("GET error:", err);    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
+

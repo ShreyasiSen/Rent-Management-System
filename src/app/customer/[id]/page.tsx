@@ -6,6 +6,9 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../.././api/auth/[...nextauth]/route";
+import { redirect } from "next/navigation";
 import {
   ArrowLeft,
   Bell,
@@ -35,10 +38,15 @@ type CustomerType = {
 export default async function CustomerPage({
   params,
 }: {
-  params: Promise<{ id: string }>; // 👈 params is a Promise
+  params: Promise<{ id: string }>; 
 }) {
-  const { id } = await params; // 👈 Await it here
+  const { id } = await params; 
   await connectDB();
+
+ const session = await getServerSession(authOptions);
+   if (!session) {
+     redirect("/login"); // If not logged in, go to login
+   }
 
   const result = await Customer.findById(id).lean();
   const customer: CustomerType | null =
@@ -57,136 +65,136 @@ export default async function CustomerPage({
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Back Button */}
-        <Button variant="ghost" asChild>
-          <Link href="/customers">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Customers
-          </Link>
-        </Button>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 p-6 font-sans">
+  <div className="max-w-4xl mx-auto space-y-6">
+    {/* Back Button */}
+    <Button
+      variant="ghost"
+      asChild
+      className="flex items-center text-2xl gap-2 text-purple-700 hover:text-purple-900 transition"
+    >
+      <Link href="/customers">
+        <ArrowLeft className="h-5 w-5 text-2xl" />
+        Back to Customers
+      </Link>
+    </Button>
 
-        {isReminderDue(customer.reminderDate) && (
-          <Badge variant="destructive">Reminder Due</Badge>
-        )}
+    {/* Reminder Badge */}
+    {isReminderDue(customer.reminderDate) && (
+      <Badge
+        variant="destructive"
+        className="px-3 py-1 text-sm font-semibold bg-gradient-to-r from-red-400 via-pink-400 to-red-500 text-white shadow-sm"
+      >
+        Reminder Due
+      </Badge>
+    )}
 
-        {/* Customer Card */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-2xl flex items-center gap-2">
-                <User className="h-6 w-6" />
-                {customer.name}
-              </CardTitle>
-              <Button>
-                <Bell className="h-4 w-4 mr-2" />
-                Send Reminder
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="flex items-center gap-3">
-                <Phone className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <p className="font-medium">Phone Number</p>
-                  <p className="text-muted-foreground">{customer.phoneNumber}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <CreditCard className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <p className="font-medium">Aadhar Number</p>
-                  <p className="text-muted-foreground">{customer.aadharNumber}</p>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <MapPin className="h-5 w-5 text-muted-foreground mt-1" />
-              <div>
-                <p className="font-medium">Address</p>
-                <p className="text-muted-foreground">{customer.address}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Financial + Engagement */}
-        <div className="grid md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5" />
-                Financial Details
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="font-medium text-muted-foreground">Current Rent</p>
-                  <p className="text-2xl font-bold">₹{customer.currentRent}</p>
-                </div>
-                <div>
-                  <p className="font-medium text-muted-foreground">Advanced Money</p>
-                  <p className="text-2xl font-bold">₹{customer.advancedMoney}</p>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="font-medium text-muted-foreground">Increase Rate</p>
-                  <p className="text-xl font-semibold">
-                    {customer.increasePercentage}%
-                  </p>
-                </div>
-                <div>
-                  <p className="font-medium text-muted-foreground">New Rent</p>
-                  <p className="text-xl font-semibold text-primary">
-                    ₹
-                    {calculateNewRent(
-                      customer.currentRent,
-                      customer.increasePercentage
-                    ).toFixed(2)}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Engagement Details
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <p className="font-medium text-muted-foreground">
-                  Years of Engagement
-                </p>
-                <p className="text-2xl font-bold">
-                  {customer.yearsOfEngagement} years
-                </p>
-              </div>
-              <div>
-                <p className="font-medium text-muted-foreground">
-                  Years Until Increase
-                </p>
-                <p className="text-xl font-semibold">
-                  {customer.yearsUntilIncrease} years
-                </p>
-              </div>
-              <div>
-                <p className="font-medium text-muted-foreground">Reminder Date</p>
-                <p className="text-lg">
-                  {new Date(customer.reminderDate).toLocaleDateString()}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+    {/* Customer Card */}
+    <Card className="rounded-3xl shadow-xl border border-gray-200 hover:shadow-2xl transition-all">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-2xl md:text-3xl flex items-center gap-2 font-bold text-gray-900">
+            <User className="h-6 w-6 text-purple-600" />
+            {customer.name}
+          </CardTitle>
+          <Button
+            variant="outline"
+            className="flex items-center gap-2 text-purple-700 hover:text-purple-900 font-semibold px-4 py-2 rounded-xl shadow-sm hover:shadow-md transition"
+          >
+            <Bell className="h-5 w-5" />
+            Send Reminder
+          </Button>
         </div>
-      </div>
+      </CardHeader>
+
+      <CardContent className="space-y-6 bg-white rounded-b-3xl p-6 md:p-8">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="flex items-center gap-3">
+            <Phone className="h-5 w-5 text-purple-400" />
+            <div>
+              <p className="font-medium text-gray-600">Phone Number</p>
+              <p className="text-gray-800 font-semibold">{customer.phoneNumber}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <CreditCard className="h-5 w-5 text-purple-400" />
+            <div>
+              <p className="font-medium text-gray-600">Aadhar Number</p>
+              <p className="text-gray-800 font-semibold">{customer.aadharNumber}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-start gap-3">
+          <MapPin className="h-5 w-5 text-purple-400 mt-1" />
+          <div>
+            <p className="font-medium text-gray-600">Address</p>
+            <p className="text-gray-800 font-semibold">{customer.address}</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+
+    {/* Financial + Engagement */}
+    <div className="grid md:grid-cols-2 gap-6">
+      <Card className="rounded-3xl shadow-lg border border-gray-200 hover:shadow-xl transition-all">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-purple-700 font-semibold text-lg">
+            <DollarSign className="h-5 w-5" />
+            Financial Details
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4 bg-white rounded-b-3xl p-6">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-gray-500 uppercase text-xs tracking-wide">Current Rent</p>
+              <p className="text-2xl font-bold text-gray-900">₹{customer.currentRent}</p>
+            </div>
+            <div>
+              <p className="text-gray-500 uppercase text-xs tracking-wide">Advanced Money</p>
+              <p className="text-2xl font-bold text-gray-900">₹{customer.advancedMoney}</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-gray-500 uppercase text-xs tracking-wide">Increase Rate</p>
+              <p className="text-xl font-semibold text-gray-900">{customer.increasePercentage}%</p>
+            </div>
+            <div>
+              <p className="text-gray-500 uppercase text-xs tracking-wide">New Rent</p>
+              <p className="text-xl font-semibold text-purple-600">
+                ₹{calculateNewRent(customer.currentRent, customer.increasePercentage).toFixed(2)}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="rounded-3xl shadow-lg border border-gray-200 hover:shadow-xl transition-all">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-purple-700 font-semibold text-lg">
+            <Calendar className="h-5 w-5" />
+            Engagement Details
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4 bg-white rounded-b-3xl p-6">
+          <div>
+            <p className="text-gray-500 uppercase text-xs tracking-wide">Years of Engagement</p>
+            <p className="text-2xl font-bold text-gray-900">{customer.yearsOfEngagement} years</p>
+          </div>
+          <div>
+            <p className="text-gray-500 uppercase text-xs tracking-wide">Years Until Increase</p>
+            <p className="text-xl font-semibold text-gray-900">{customer.yearsUntilIncrease} years</p>
+          </div>
+          <div>
+            <p className="text-gray-500 uppercase text-xs tracking-wide">Reminder Date</p>
+            <p className="text-lg font-semibold text-gray-800">{new Date(customer.reminderDate).toLocaleDateString()}</p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
+  </div>
+</div>
+
   );
 }

@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import { Card, CardContent} from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
 import { Trash2, Bell } from 'lucide-react';
@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { ObjectId } from "mongoose";
 
 interface Customer {
-  _id?: ObjectId;  
+  _id?: ObjectId;
   name: string;
   phoneNumber: string;
   address: string;
@@ -71,71 +71,89 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {localCustomers.map((customer) => (
-        <Card 
-          key={customer._id?.toString()} 
-          className="w-full cursor-pointer hover:shadow-md transition-shadow" 
+        <div
+          key={customer._id?.toString()}
+          className="relative group cursor-pointer rounded-3xl overflow-hidden shadow-2xl border border-gray-100 transition-transform transform hover:-translate-y-1"
           onClick={() => router.push(`/customer/${customer?._id}`)}
         >
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">{customer.name}</CardTitle>
-              <div className="flex items-center gap-2">
+          {/* Gradient Top Bar */}
+          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-black via-purple-500 to-black"></div>
+
+          <CardContent className="p-6 md:p-8 bg-white">
+            <div className="flex items-center justify-between gap-4">
+              {/* Customer Name */}
+              <h2 className="text-2xl md:text-3xl font-bold text-purple-900 flex-1">
+                {customer.name}
+              </h2>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-4">
                 {isReminderDue(customer.reminderDate) && (
-                  <Badge variant="destructive">Reminder Due</Badge>
+                  <Badge
+                    variant="destructive"
+                    className="py-1 px-3 text-sm md:text-base font-semibold"
+                  >
+                    Reminder Due
+                  </Badge>
                 )}
+
                 <Button
                   variant="ghost"
                   size="sm"
+                  className="p-3 md:p-4 rounded-xl hover:bg-purple-100 transition"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleReminder(customer);
                   }}
                 >
-                  <Bell className="h-4 w-4 cursor-pointer" />
+                  <Bell className="h-6 w-6 md:h-8 md:w-8 text-purple-600" />
                 </Button>
 
                 <Button
                   variant="ghost"
                   size="sm"
+                  className="p-3 md:p-4 rounded-xl hover:bg-red-100 transition"
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (customer._id) {
-                      handleDelete(customer._id.toString()); 
-                    }
+                    if (customer._id) handleDelete(customer._id.toString());
                   }}
                 >
-                  <Trash2 className="h-4 w-4 cursor-pointer" />
+                  <Trash2 className="h-6 w-6 md:h-8 md:w-8 text-red-600" />
                 </Button>
               </div>
             </div>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+
+            {/* Rent Info */}
+            <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-6 bg-gray-50 p-4 rounded-2xl">
               <div>
-                <p className="font-medium text-muted-foreground">Current Rent</p>
-                <p className="text-lg font-semibold">₹{customer.currentRent}</p>
+                <p className="text-lg text-black uppercase">Current Rent</p>
+                <p className="text-lg font-semibold text-gray-800">₹{customer.currentRent}</p>
               </div>
               <div>
-                <p className="font-medium text-muted-foreground">Increase</p>
-                <p className="text-lg font-semibold">{customer.increasePercentage}%</p>
+                <p className="text-lg text-black uppercase">Increase</p>
+                <p className="text-lg font-semibold text-gray-800">{customer.increasePercentage}%</p>
               </div>
               <div>
-                <p className="font-medium text-muted-foreground">New Rent</p>
-                <p className="text-lg font-semibold text-primary">
+                <p className="text-lg text-black uppercase">New Rent</p>
+                <p className="text-lg font-bold text-purple-600">
                   ₹{calculateNewRent(customer.currentRent, customer.increasePercentage).toFixed(2)}
                 </p>
               </div>
               <div>
-                <p className="font-medium text-muted-foreground">Years/Reminder</p>
-                <p className="text-lg font-semibold">{customer.yearsUntilIncrease} yr</p>
-                <p className="text-xs text-muted-foreground">{customer.reminderDate}</p>
+                <p className="text-lg text-black uppercase">Years / Reminder</p>
+                <p className="text-lg font-semibold text-gray-800">{customer.yearsUntilIncrease} yr</p>
+                <p className="text-xs text-gray-500 mt-1">{customer.reminderDate}</p>
               </div>
             </div>
           </CardContent>
-        </Card>
+
+          {/* Subtle hover animation overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-50 via-pink-50 to-indigo-50 opacity-0 group-hover:opacity-20 transition-opacity rounded-3xl pointer-events-none"></div>
+        </div>
       ))}
     </div>
+
   );
 };

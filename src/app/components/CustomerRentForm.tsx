@@ -93,12 +93,12 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
 
 
   return (
-    <Card className="w-full max-w-5xl mx-auto shadow-2xl rounded-2xl 
+    <Card className="w-full max-w-5xl mx-auto shadow-2xl shadow-accent-foreground rounded-xl 
                 border border-white/20 
                 bg-gradient-to-br from-white/10 via-white/5 to-transparent 
                 backdrop-blur-xl">
       <CardHeader className="text-center pb-2 pt-4">
-        <CardTitle className="text-4xl font-extrabold text-gray-900 tracking-tight drop-shadow-sm">
+        <CardTitle className="text-4xl font-bold text-purple-800 tracking-tight drop-shadow-sm">
           Add Customer Rent Details
         </CardTitle>
         <CardDescription className="text-base text-gray-600 mt-2">
@@ -119,7 +119,7 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700">Customer Name</FormLabel>
+                    <FormLabel className="text-lg font-medium text-gray-700">Customer Name</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="John Doe"
@@ -139,7 +139,7 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                 name="phoneNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700">Phone Number</FormLabel>
+                    <FormLabel className="text-lg font-medium text-gray-700">Phone Number</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="+91 9876543210"
@@ -159,7 +159,7 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                 name="address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700">Address</FormLabel>
+                    <FormLabel className="text-lg font-medium text-gray-700">Address</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="123 Main Street"
@@ -179,7 +179,7 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                 name="aadharNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700">Aadhar Number</FormLabel>
+                    <FormLabel className="text-lg font-medium text-gray-700">Aadhar Number</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="XXXX-XXXX-XXXX"
@@ -202,7 +202,7 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                 name="yearsOfEngagement"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-600">Years of Engagement</FormLabel>
+                    <FormLabel className="text-lg font-medium text-gray-600">Years of Engagement</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -224,7 +224,7 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                 name="advancedMoney"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-600">Advanced Money (₹)</FormLabel>
+                    <FormLabel className="text-lg font-medium text-gray-600">Advanced Money (₹)</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -246,7 +246,7 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                 name="currentRent"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-600">Current Rent (₹)</FormLabel>
+                    <FormLabel className="text-lg font-medium text-gray-600">Current Rent (₹)</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -268,7 +268,7 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                 name="increasePercentage"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-600">Increase Percentage (%)</FormLabel>
+                    <FormLabel className="text-lg font-medium text-gray-600">Increase Percentage (%)</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -290,7 +290,7 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                 name="yearsUntilIncrease"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-600">Years Until Increase</FormLabel>
+                    <FormLabel className="text-lg font-medium text-gray-600">Years Until Increase</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -312,7 +312,7 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                 name="reminderDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-600">Reminder Date</FormLabel>
+                    <FormLabel className="text-lg font-medium text-gray-600">Reminder Date</FormLabel>
                     <FormControl>
                       <Input
                         type="date"
