@@ -28,16 +28,16 @@ const customerSchema = z.object({
   name: z.string().min(2, "Customer name must be at least 2 characters"),
   phoneNumber: z.string().min(10, "Phone number must be at least 10 digits"),
   address: z.string().min(5, "Address must be at least 5 characters"),
-  aadharNumber: z.string().length(12, "Aadhar number must be 12 digits"),
-  yearsOfEngagement: z.number().min(0, "Years of engagement must be positive"),
-  advancedMoney: z.number().min(0, "Advanced money must be positive"),
-  currentRent: z.number().min(0, "Rent must be positive"),
+  aadharNumber: z.string().min(0, ""),
+  yearsOfEngagement: z.string().min(0, "Years of engagement must be positive"),
+  advancedMoney: z.string().min(0, "Advanced money must be positive"),
+  currentRent: z.string().min(0, "Rent must be positive"),
   increasePercentage: z
-    .number()
-    .min(0)
+    .string()
+    .min(0, "Percentage must be between 0-100")
     .max(100, "Percentage must be between 0-100"),
-  yearsUntilIncrease: z.number().min(1, "Years must be at least 1"),
-  reminderDate: z.string().min(1, "Reminder date is required"),
+  yearsUntilIncrease: z.string().min(0, "Years must be at least 1"),
+  reminderDate: z.string().min(0, ""),
 });
 
 type CustomerFormData = z.infer<typeof customerSchema>;
@@ -56,11 +56,11 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
       phoneNumber: "",
       address: "",
       aadharNumber: "",
-      yearsOfEngagement: 0,
-      advancedMoney: 0,
-      currentRent: 0,
-      increasePercentage: 0,
-      yearsUntilIncrease: 1,
+      yearsOfEngagement: "",
+      advancedMoney: "",
+      currentRent: "",
+      increasePercentage: "",
+      yearsUntilIncrease: "",
       reminderDate: "",
     },
   });
@@ -122,7 +122,7 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                     <FormLabel className="text-lg font-medium text-gray-700">Customer Name</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="John Doe"
+                        placeholder="Type Customer Name"
                         {...field}
                         className="h-12 rounded-lg border-gray-200 bg-white/70 backdrop-blur-sm 
                                focus:border-blue-600 focus:ring-2 focus:ring-blue-400/50 
@@ -142,7 +142,7 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                     <FormLabel className="text-lg font-medium text-gray-700">Phone Number</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="+91 9876543210"
+                        placeholder="Type phone number"
                         {...field}
                         className="h-12 rounded-lg border-gray-200 bg-white/70 backdrop-blur-sm 
                                focus:border-blue-600 focus:ring-2 focus:ring-blue-400/50 
@@ -162,7 +162,7 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                     <FormLabel className="text-lg font-medium text-gray-700">Address</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="123 Main Street"
+                        placeholder="Type the address"
                         {...field}
                         className="h-12 rounded-lg border-gray-200 bg-white/70 backdrop-blur-sm 
                                focus:border-blue-600 focus:ring-2 focus:ring-blue-400/50 
@@ -179,10 +179,10 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                 name="aadharNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-lg font-medium text-gray-700">Aadhar Number</FormLabel>
+                    <FormLabel className="text-lg font-medium text-gray-700">Aadhar/Pan/GST Number</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="XXXX-XXXX-XXXX"
+                        placeholder="Type aadhar/pan/gst number"
                         {...field}
                         className="h-12 rounded-lg border-gray-200 bg-white/70 backdrop-blur-sm 
                                focus:border-blue-600 focus:ring-2 focus:ring-blue-400/50 
@@ -208,7 +208,7 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                         type="number"
                         placeholder="0"
                         {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        // onChange={(e) => field.onChange(Number(e.target.value))}
                         className="h-12 rounded-lg border-gray-200 bg-white/70 backdrop-blur-sm 
                                focus:border-blue-600 focus:ring-2 focus:ring-blue-400/50 
                                transition-all shadow-sm text-gray-900"
@@ -230,7 +230,6 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                         type="number"
                         placeholder="0"
                         {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
                         className="h-12 rounded-lg border-gray-200 bg-white/70 backdrop-blur-sm 
                                focus:border-blue-600 focus:ring-2 focus:ring-blue-400/50 
                                transition-all shadow-sm text-gray-900"
@@ -252,7 +251,6 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                         type="number"
                         placeholder="0"
                         {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
                         className="h-12 rounded-lg border-gray-200 bg-white/70 backdrop-blur-sm 
                                focus:border-blue-600 focus:ring-2 focus:ring-blue-400/50 
                                transition-all shadow-sm text-gray-900"
@@ -274,7 +272,6 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                         type="number"
                         placeholder="0"
                         {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
                         className="h-12 rounded-lg border-gray-200 bg-white/70 backdrop-blur-sm 
                                focus:border-blue-600 focus:ring-2 focus:ring-blue-400/50 
                                transition-all shadow-sm text-gray-900"
@@ -296,7 +293,6 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                         type="number"
                         placeholder="1"
                         {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
                         className="h-12 rounded-lg border-gray-200 bg-white/70 backdrop-blur-sm 
                                focus:border-blue-600 focus:ring-2 focus:ring-blue-400/50 
                                transition-all shadow-sm text-gray-900"

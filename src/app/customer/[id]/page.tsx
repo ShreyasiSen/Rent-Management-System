@@ -17,7 +17,7 @@ import {
   MapPin,
   CreditCard,
   Calendar,
-  DollarSign,
+  IndianRupee,
 } from "lucide-react";
 
 type CustomerType = {
@@ -140,7 +140,7 @@ export default async function CustomerPage({
       <Card className="rounded-3xl shadow-lg border border-gray-200 hover:shadow-xl transition-all">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-purple-700 font-semibold text-lg">
-            <DollarSign className="h-5 w-5" />
+            <IndianRupee className="h-5 w-5" />
             Financial Details
           </CardTitle>
         </CardHeader>
