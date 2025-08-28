@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
-import { Trash2, Bell } from 'lucide-react';
+import { Trash2} from 'lucide-react';
 import { toast } from 'sonner';
 import { useRouter } from "next/navigation";
 import { ObjectId } from "mongoose";
@@ -46,11 +46,11 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
     return reminder <= today;
   };
 
-  const handleReminder = (customer: Customer) => {
-    toast("Rent Increase Reminder", {
-      description: `Time to increase ${customer.name}'s rent from ₹${customer.currentRent} to ₹${calculateNewRent(customer.currentRent, customer.increasePercentage).toFixed(2)}`,
-    });
-  };
+  // const handleReminder = (customer: Customer) => {
+  //   toast("Rent Increase Reminder", {
+  //     description: `Time to increase ${customer.name}'s rent from ₹${customer.currentRent} to ₹${calculateNewRent(customer.currentRent, customer.increasePercentage).toFixed(2)}`,
+  //   });
+  // };
 
   const handleDelete = (id: string) => {
     setLocalCustomers((prev) => prev.filter((c) => c._id?.toString() !== id));
@@ -82,7 +82,7 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
           <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-black via-purple-500 to-black"></div>
 
           <CardContent className="p-6 md:p-8 bg-white">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center justify-between gap-2">
               {/* Customer Name */}
               <h2 className="text-2xl md:text-3xl font-bold text-purple-900 flex-1">
                 {customer.name}
@@ -99,7 +99,7 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
                   </Badge>
                 )}
 
-                <Button
+                {/* <Button
                   variant="ghost"
                   size="sm"
                   className="p-3 md:p-4 rounded-xl hover:bg-purple-100 transition"
@@ -109,19 +109,19 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
                   }}
                 >
                   <Bell className="h-6 w-6 md:h-8 md:w-8 text-purple-600" />
-                </Button>
+                </Button> */}
 
                 <Button
                   variant="ghost"
-                  size="sm"
-                  className="p-3 md:p-4 rounded-xl hover:bg-red-100 transition"
+                  size="lg"
+                  className="p-2 md:p-4 rounded-xl hover:bg-red-100 transition"
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelectedCustomerId(customer._id?.toString() || null);
                     setIsModalOpen(true); // open modal
                   }}
                 >
-                  <Trash2 className="h-6 w-6 md:h-8 md:w-8 text-red-600" />
+                  <Trash2 className="h-8 w-8 md:h-8 md:w-8 text-red-600" />
                 </Button>
 
               </div>
