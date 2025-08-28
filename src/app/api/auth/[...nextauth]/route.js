@@ -12,8 +12,8 @@ export const authOptions = {
       async authorize(credentials) {
         // 🔐 Replace with real DB check
         if (
-          credentials.username === "subirsen" &&
-          credentials.password === "051165"
+          credentials.username === process.env.DB_USERNAME &&
+          credentials.password === process.env.DB_PASSWORD
         ) {
           return { id: "1", name: "Subir Sen" };
         }
