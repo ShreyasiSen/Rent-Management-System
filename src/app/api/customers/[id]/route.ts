@@ -1,6 +1,8 @@
 import { NextResponse, NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Customer from "@/models/Customer";
+import { CustomerBackup } from "@/models/Customer";
+import mongoose from "mongoose";
 
 
 // ✅ DELETE /api/customers/[id]
@@ -39,8 +41,45 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     if (!customer) {
       return NextResponse.json({ error: "Customer not found" }, { status: 404 });
     }
-   return new Response(JSON.stringify(customer), { status: 200 });
-  } catch (err) {    console.error("GET error:", err);    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return new Response(JSON.stringify(customer), { status: 200 });
+  } catch (err) {
+    console.error("GET error:", err); return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
+}
+
+export async function PUT(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
+  await connectDB();
+  const { id } =await params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
+  }
+
+  const body = await req.json();
+
+  const updatedCustomer = await Customer.findByIdAndUpdate(
+    id,
+    { $set: body },
+    { new: true } // return updated doc
+  );
+
+  // if (updatedCustomer) {
+  //   await CustomerBackup.create({ ...body, originalId: params.id });
+  // }
+
+  await CustomerBackup.findByIdAndUpdate(
+    id,
+    { $set: body },
+    { new: true } 
+  );
+
+  if (!updatedCustomer) {
+    return NextResponse.json({ error: "Customer not found" }, { status: 404 });
+  }
+
+  return NextResponse.json(updatedCustomer);
 }
 

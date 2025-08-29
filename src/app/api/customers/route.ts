@@ -1,6 +1,7 @@
 import { connectDB } from "@/lib/mongodb";
 import Customer from "@/models/Customer";
 import { NextResponse } from "next/server";
+import { CustomerBackup } from "@/models/Customer";
 
 // GET all customers
 export async function GET() {
@@ -14,6 +15,7 @@ export async function POST(req: Request) {
   await connectDB();
   const data = await req.json();
   const newCustomer = await Customer.create(data);
+  await CustomerBackup.create({...data,_id: newCustomer._id,originalId: newCustomer._id});
   return NextResponse.json(newCustomer);
 }
 

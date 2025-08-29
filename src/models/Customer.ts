@@ -1,4 +1,4 @@
-import mongoose, { Schema, model, models } from "mongoose";
+import mongoose,{ Schema, model, models } from "mongoose";
 
 const customerSchema = new Schema(
   {
@@ -18,3 +18,6 @@ const customerSchema = new Schema(
 
 const Customer = models.Customer || model("Customer", customerSchema);
 export default Customer;
+
+export const CustomerBackup = mongoose.models.CustomerBackup 
+  || mongoose.model("CustomerBackup", customerSchema, "customers_backup");

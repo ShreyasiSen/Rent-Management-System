@@ -1,6 +1,7 @@
 import { connectDB } from "@/lib/mongodb";
 import Customer from "@/models/Customer";
-import { CustomerRentList } from "../components/CustomerRentList";
+// import { CustomerRentList } from "../components/CustomerRentList";
+import CustomerSearchList from "../components/CustomerSearchList";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
@@ -15,7 +16,7 @@ export default async function CustomersPage() {
 
   const session = await getServerSession(authOptions);
   if (!session) {
-    redirect("/login"); // If not logged in, go to login
+    redirect("/login"); 
   }
 
   async function deleteCustomer(id: string) {
@@ -28,13 +29,11 @@ export default async function CustomersPage() {
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-slate-100 to-blue-50 p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 w-full">
-          {/* Title */}
           <h1 className="text-4xl sm:text-5xl md:text-5xl mb-6 font-extrabold tracking-tight bg-clip-text text-black drop-shadow-sm flex-shrink-0">
             ALL CUSTOMERS
           </h1>
-          {/* Buttons */}
           <div className="flex gap-4 flex-shrink-0">
-            {/* Go Home Button */}
+            
             <Button
               asChild
               className="rounded-xl shadow-lg px-5 sm:px-6 py-3 bg-gradient-to-l from-purple-800 to-purple-600 hover:from-purple-800 hover:to-gray-900 transition transform hover:scale-105"
@@ -44,7 +43,6 @@ export default async function CustomersPage() {
               </Link>
             </Button>
 
-            {/* Add Customer Button */}
             <Button
               asChild
               className="rounded-xl shadow-lg px-5 sm:px-6 py-3 bg-gradient-to-r from-purple-800 to-purple-500 hover:from-purple-800 hover:to-gray-900 transition transform hover:scale-105"
@@ -57,10 +55,7 @@ export default async function CustomersPage() {
         </div>
         
         {customers && customers.length > 0 ? (
-          <CustomerRentList
-            customers={JSON.parse(JSON.stringify(customers))}
-            onDeleteCustomer={deleteCustomer}
-          />
+          <CustomerSearchList onDeleteCustomer={deleteCustomer} />
         ) : (
           <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
             <svg
@@ -82,7 +77,7 @@ export default async function CustomersPage() {
               No customers added yet
             </p>
             <p className="text-gray-400">
-              Start by adding your first customer to get going 🚀
+              Start by adding your first customer to get going 
             </p>
             <Button
               asChild
