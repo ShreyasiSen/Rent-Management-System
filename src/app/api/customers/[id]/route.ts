@@ -48,17 +48,15 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 }
 
 export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+  request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
   await connectDB();
-  const { id } =await params;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
   }
 
-  const body = await req.json();
+  const body = await request.json();
 
   const updatedCustomer = await Customer.findByIdAndUpdate(
     id,
