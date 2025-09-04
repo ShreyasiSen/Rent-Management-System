@@ -13,6 +13,8 @@ interface Customer {
   yearsOfEngagement: number;
   currentRent: number;
   increasePercentage: number;
+  startingRent: number;
+  previousIncrementDate: string;
   previousRent: number;
   advancedMoney: number;
   yearsUntilIncrease: number;

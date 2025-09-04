@@ -27,8 +27,9 @@ import { toast } from "sonner";
 const customerSchema = z.object({
   name: z.string().min(2, "Customer name must be at least 2 characters"),
   phoneNumber: z.string().min(10, "Phone number must be at least 10 digits"),
-  address: z.string().min(5, "Address must be at least 5 characters"),
+  address: z.string().min(1, "Address must be at least 1 character"),
   aadharNumber: z.string().min(0, ""),
+  startingRent: z.string().min(0, ""),
   yearsOfEngagement: z.string().min(0, "Years of engagement must be positive"),
   advancedMoney: z.string().min(0, "Advanced money must be positive"),
   currentRent: z.string().min(0, "Rent must be positive"),
@@ -36,6 +37,7 @@ const customerSchema = z.object({
     .string()
     .min(0, "Percentage must be between 0-100")
     .max(100, "Percentage must be between 0-100"),
+  previousIncrementDate: z.string().min(0, ""),
   yearsUntilIncrease: z.string().min(0, "Years must be at least 1"),
   reminderDate: z.string().min(0, ""),
 });
@@ -57,9 +59,11 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
       address: "",
       aadharNumber: "",
       yearsOfEngagement: "",
+      startingRent: "",
       advancedMoney: "",
       currentRent: "",
       increasePercentage: "",
+      previousIncrementDate: "",
       yearsUntilIncrease: "",
       reminderDate: "",
     },
@@ -202,11 +206,11 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                 name="yearsOfEngagement"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-lg font-medium text-gray-600">Years of Engagement</FormLabel>
+                    <FormLabel className="text-lg font-medium text-gray-600">Engagement Year</FormLabel>
                     <FormControl>
                       <Input
-                        type="number"
-                        placeholder="0"
+                        // type="number"
+                        placeholder="Type the engagement year"
                         {...field}
                         // onChange={(e) => field.onChange(Number(e.target.value))}
                         className="h-12 rounded-lg border-gray-200 bg-white/70 backdrop-blur-sm 
@@ -227,8 +231,8 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                     <FormLabel className="text-lg font-medium text-gray-600">Advanced Money (₹)</FormLabel>
                     <FormControl>
                       <Input
-                        type="number"
-                        placeholder="0"
+                        // type="number"
+                        placeholder="Type amount"
                         {...field}
                         className="h-12 rounded-lg border-gray-200 bg-white/70 backdrop-blur-sm 
                                focus:border-blue-600 focus:ring-2 focus:ring-blue-400/50 
@@ -240,6 +244,27 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                 )}
               />
 
+            <FormField
+              control={form.control}
+              name="startingRent"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-lg font-medium text-gray-600">Starting Rent (₹)</FormLabel>
+                  <FormControl>
+                    <Input
+                      // type="number"
+                      placeholder="Type amount"
+                      {...field}
+                      className="h-12 rounded-lg border-gray-200 bg-white/70 backdrop-blur-sm 
+                             focus:border-blue-600 focus:ring-2 focus:ring-blue-400/50 
+                             transition-all shadow-sm text-gray-900"
+                    />
+                  </FormControl>
+                  <FormMessage className="text-sm text-red-500" />
+                </FormItem>
+              )}
+            /> 
+
               <FormField
                 control={form.control}
                 name="currentRent"
@@ -248,8 +273,8 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                     <FormLabel className="text-lg font-medium text-gray-600">Current Rent (₹)</FormLabel>
                     <FormControl>
                       <Input
-                        type="number"
-                        placeholder="0"
+                        // type="number"
+                        placeholder="Type amount"
                         {...field}
                         className="h-12 rounded-lg border-gray-200 bg-white/70 backdrop-blur-sm 
                                focus:border-blue-600 focus:ring-2 focus:ring-blue-400/50 
@@ -269,8 +294,29 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                     <FormLabel className="text-lg font-medium text-gray-600">Increase Percentage (%)</FormLabel>
                     <FormControl>
                       <Input
-                        type="number"
-                        placeholder="0"
+                        // type="number"
+                        placeholder="Type percentage"
+                        {...field}
+                        className="h-12 rounded-lg border-gray-200 bg-white/70 backdrop-blur-sm 
+                               focus:border-blue-600 focus:ring-2 focus:ring-blue-400/50 
+                               transition-all shadow-sm text-gray-900"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-sm text-red-500" />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="previousIncrementDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-lg font-medium text-gray-600">Previous Increment Date</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="date"
+                        placeholder="Select Date"
                         {...field}
                         className="h-12 rounded-lg border-gray-200 bg-white/70 backdrop-blur-sm 
                                focus:border-blue-600 focus:ring-2 focus:ring-blue-400/50 
@@ -290,8 +336,8 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                     <FormLabel className="text-lg font-medium text-gray-600">Years Until Increase</FormLabel>
                     <FormControl>
                       <Input
-                        type="number"
-                        placeholder="1"
+                        // type="number"
+                        placeholder="Enter number of years"
                         {...field}
                         className="h-12 rounded-lg border-gray-200 bg-white/70 backdrop-blur-sm 
                                focus:border-blue-600 focus:ring-2 focus:ring-blue-400/50 
@@ -303,7 +349,7 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                 )}
               />
 
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="reminderDate"
                 render={({ field }) => (
@@ -321,7 +367,7 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                     <FormMessage className="text-sm text-red-500" />
                   </FormItem>
                 )}
-              />
+              /> */}
             </div>
 
             {/* Submit Button */}

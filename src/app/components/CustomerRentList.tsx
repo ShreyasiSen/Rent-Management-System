@@ -16,11 +16,14 @@ interface Customer {
   aadharNumber: string;
   yearsOfEngagement: number;
   advancedMoney: number;
+  startingRent: number;
   currentRent: number;
   increasePercentage: number;
+  previousIncrementDate: string;  // ✅ keep as string
   yearsUntilIncrease: number;
-  reminderDate: string;
+  reminderDate: string;           // ✅ keep as string
 }
+
 
 interface CustomerRentListProps {
   customers: Customer[];
@@ -43,10 +46,61 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
   const calculateNewRent = (currentRent: number, percentage: number) =>
     currentRent + (currentRent * percentage / 100);
 
-  const isReminderDue = (reminderDate: string) => {
+  // __define-ocg__
+  const calculateNextIncrement = (customer: Customer) => {
+    const nextIncrementDate = new Date(customer.previousIncrementDate);
+    nextIncrementDate.setFullYear(
+      nextIncrementDate.getFullYear() + customer.yearsUntilIncrease
+    );
+
     const today = new Date();
-    const reminder = new Date(reminderDate);
+
+    if (today >= nextIncrementDate) {
+      const newRent =
+        customer.currentRent +
+        (customer.currentRent * customer.increasePercentage) / 100;
+
+      return {
+        ...customer,
+        currentRent: newRent,
+        previousIncrementDate: nextIncrementDate.toISOString(), // ✅ store as string
+        reminderDate: nextIncrementDate.toISOString(),          // ✅ store as string
+      };
+    }
+    return customer;
+  };
+
+  const isIncrementToday = (customer: Customer) => {
+    const today = new Date();
+    const lastIncrement = new Date(customer.previousIncrementDate);
+
+    // Compare only the date part (ignore time)
+    return (
+      lastIncrement.getFullYear() === today.getFullYear() &&
+      lastIncrement.getMonth() === today.getMonth() &&
+      lastIncrement.getDate() === today.getDate()
+    );
+  };
+
+
+  const isReminderDue = (customer: Customer) => {
+    const today = new Date();
+    const reminder = new Date(customer.previousIncrementDate);
+    reminder.setFullYear(reminder.getFullYear() + customer.yearsUntilIncrease);
     return reminder <= today;
+  };
+
+  const isReminderWithin3Days = (customer: Customer) => {
+    const today = new Date();
+
+    const nextIncrement = new Date(customer.previousIncrementDate);
+    nextIncrement.setFullYear(nextIncrement.getFullYear() + customer.yearsUntilIncrease);
+
+    const diffTime = nextIncrement.getTime() - today.getTime();
+
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+    return diffDays >= 0 && diffDays <= 3;
   };
 
   const handleDelete = (id: string) => {
@@ -55,6 +109,17 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
     toast("🗑️ Customer Deleted", {
       description: "Customer has been removed successfully.",
     });
+  };
+
+  const calculateReminderDate = (customer: Customer) => {
+    const prevDate = new Date(customer.previousIncrementDate);
+    prevDate.setFullYear(prevDate.getFullYear() + customer.yearsUntilIncrease);
+    return prevDate.toISOString().split("T")[0];
+  };
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toISOString().split("T")[0];
   };
 
   const handleEditSave = async () => {
@@ -79,8 +144,16 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
       toast("❌ Failed to update", { description: "Please try again." });
     }
   };
+  const processedCustomers = localCustomers
+    .map(c => calculateNextIncrement(c))
+    .sort((a, b) => {
+      const aToday = isIncrementToday(a) ? 0 : isReminderWithin3Days(a) ? 1 : 2;
+      const bToday = isIncrementToday(b) ? 0 : isReminderWithin3Days(b) ? 1 : 2;
+      return aToday - bToday;
+    });
 
-  if (localCustomers.length === 0) {
+
+  if (processedCustomers.length === 0) {
     return (
       <Card className="w-full">
         <CardContent className="p-8 text-center">
@@ -92,7 +165,7 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
 
   return (
     <div className="space-y-6">
-      {localCustomers.map((customer) => (
+      {processedCustomers.map((customer) => (
         <div
           key={customer._id?.toString()}
           className="relative group cursor-pointer rounded-3xl overflow-hidden shadow-2xl border border-gray-100 transition-transform transform hover:-translate-y-1"
@@ -107,12 +180,21 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
               </h2>
 
               <div className="flex items-center gap-4">
-                {isReminderDue(customer.reminderDate) && (
-                  <Badge
-                    variant="destructive"
-                    className="py-1 px-3 text-sm md:text-base font-semibold"
-                  >
+                {isReminderDue(customer) && (
+                  <Badge variant="destructive" className="px-3 py-1 text-sm font-semibold bg-red-500 text-white shadow-sm">
                     Reminder Due
+                  </Badge>
+                )}
+
+                {!isReminderDue(customer) && isReminderWithin3Days(customer) && (
+                  <Badge variant="secondary" className="px-3 py-1 text-sm font-semibold bg-yellow-400 text-black shadow-sm">
+                    Upcoming Reminder
+                  </Badge>
+                )}
+
+                {isIncrementToday(customer) && (
+                  <Badge className="px-3 py-1 text-sm font-semibold bg-green-500 text-white shadow-sm">
+                    Today is Increment Day
                   </Badge>
                 )}
 
@@ -146,26 +228,38 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
               </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-6 bg-gray-50 p-4 rounded-2xl">
+            <div className="mt-6 grid grid-cols-2 md:grid-cols-6 gap-6 bg-gray-50 p-4 rounded-2xl">
               <div>
-                <p className="text-lg text-black uppercase">Current Rent</p>
+                <p className="text-xl text-black ">Starting Rent</p>
+                <p className="text-lg font-semibold text-gray-800">₹{customer.startingRent}</p>
+              </div>
+              <div>
+                <p className="text-xl text-black ">Current Rent</p>
                 <p className="text-lg font-semibold text-gray-800">₹{customer.currentRent}</p>
               </div>
               <div>
-                <p className="text-lg text-black uppercase">Increase</p>
+                <p className="text-xl text-black ">Increase %</p>
                 <p className="text-lg font-semibold text-gray-800">{customer.increasePercentage}%</p>
               </div>
               <div>
-                <p className="text-lg text-black uppercase">New Rent</p>
+                <p className="text-xl text-black ">New Rent</p>
                 <p className="text-lg font-bold text-purple-600">
                   ₹{calculateNewRent(customer.currentRent, customer.increasePercentage).toFixed(2)}
                 </p>
               </div>
               <div>
-                <p className="text-lg text-black uppercase">Years / Reminder</p>
-                <p className="text-lg font-semibold text-gray-800">{customer.yearsUntilIncrease} yr</p>
-                <p className="text-xs text-gray-500 mt-1">{customer.reminderDate}</p>
+                <p className="text-xl text-black ">Last Increment Date (yyyy-mm-dd)</p>
+                <p className="text-lg font-bold text-purple-600">
+                  {formatDate(customer.previousIncrementDate)}
+                </p>
               </div>
+              <div>
+                <p className="text-xl text-black">Next Increment Date (yyyy-mm-dd)</p>
+                <p className="text-lg font-bold text-purple-600">
+                  {calculateReminderDate(customer)}
+                </p>
+              </div>
+
             </div>
           </CardContent>
 
@@ -182,10 +276,10 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
               Are you sure you want to delete this customer? This action cannot be undone.
             </p>
             <div className="flex justify-end gap-4 mt-4">
-              <Button onClick={() => setIsDeleteModalOpen(false)} className="bg-gray-100 text-gray-800 rounded-lg text-xl px-4 py-2 hover:bg-gray-200">
+              <Button onClick={() => setIsDeleteModalOpen(false)} className="cursor-pointer bg-gray-100 text-gray-800 rounded-lg text-xl px-4 py-2 hover:bg-gray-200">
                 Cancel
               </Button>
-              <Button onClick={() => { handleDelete(selectedCustomerId); setIsDeleteModalOpen(false); }} className="bg-red-500 text-white text-xl rounded-lg px-4 py-2 hover:bg-red-600">
+              <Button onClick={() => { handleDelete(selectedCustomerId); setIsDeleteModalOpen(false); }} className="bg-red-500 text-white text-xl rounded-lg px-4 py-2 hover:bg-red-600 cursor-pointer">
                 Delete
               </Button>
             </div>
@@ -193,7 +287,6 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
         </div>
       )}
 
-      {/* Edit Modal */}
       {/* Edit Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-80 flex items-center justify-center bg-black/40 backdrop-blur-lg">
@@ -247,15 +340,15 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
 
               {/* Years of Engagement */}
               <div>
-                <label className="block text-gray-700 font-medium mb-1">Years of Engagement</label>
+                <label className="block text-gray-700 font-medium mb-1">Engagement Year</label>
                 <input
-                  type="number"
+                  // type="number"
                   className="w-full border p-2 rounded-lg"
                   value={editForm.yearsOfEngagement || ""}
                   onChange={(e) =>
                     setEditForm({ ...editForm, yearsOfEngagement: Number(e.target.value) })
                   }
-                  placeholder="Years of Engagement"
+                  placeholder="Engagement Year"
                 />
               </div>
 
@@ -263,7 +356,7 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
               <div>
                 <label className="block text-gray-700 font-medium mb-1">Advanced Money</label>
                 <input
-                  type="number"
+                  // type="number"
                   className="w-full border p-2 rounded-lg"
                   value={editForm.advancedMoney || ""}
                   onChange={(e) =>
@@ -273,11 +366,26 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
                 />
               </div>
 
+              <div>
+                {/* Starting Rent */}
+                <label className="block text-gray-700 font-medium mb-1">Starting Rent (₹)</label>
+                <input
+                  // type="number"
+                  className="w-full border p-2 rounded-lg"
+                  value={editForm.startingRent || ""}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, startingRent: Number(e.target.value) })
+                  }
+                  placeholder="Starting Rent"
+                />
+              </div>
+
+
               {/* Current Rent */}
               <div>
                 <label className="block text-gray-700 font-medium mb-1">Current Rent (₹)</label>
                 <input
-                  type="number"
+                  // type="number"
                   className="w-full border p-2 rounded-lg"
                   value={editForm.currentRent || ""}
                   onChange={(e) =>
@@ -291,40 +399,54 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
               <div>
                 <label className="block text-gray-700 font-medium mb-1">Increase Percentage (%)</label>
                 <input
-                  type="number"
+                  // type="number"
                   className="w-full border p-2 rounded-lg"
                   value={editForm.increasePercentage || ""}
                   onChange={(e) =>
                     setEditForm({ ...editForm, increasePercentage: Number(e.target.value) })
                   }
-                  placeholder="Increase %"
+                  placeholder="Increase Percentage"
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-700 font-medium mb-1">Previous Increment Date</label>
+                <input
+                  type="date"
+                  className="w-full border p-2 rounded-lg"
+                  value={editForm.previousIncrementDate ? formatDate(editForm.previousIncrementDate) : ""}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, previousIncrementDate: e.target.value }) // store as string
+                  }
+
+                  placeholder='Select Date'
                 />
               </div>
 
               {/* Years Until Increase */}
               <div>
-                <label className="block text-gray-700 font-medium mb-1">Years Until Next Increase</label>
+                <label className="block text-gray-700 font-medium mb-1">Years Until Increase</label>
                 <input
-                  type="number"
+                  // type="number"
                   className="w-full border p-2 rounded-lg"
                   value={editForm.yearsUntilIncrease || ""}
                   onChange={(e) =>
                     setEditForm({ ...editForm, yearsUntilIncrease: Number(e.target.value) })
                   }
-                  placeholder="Years Until Next Increase"
+                  placeholder="Type number of years"
                 />
               </div>
 
               {/* Reminder Date */}
-              <div>
+              {/* <div>
                 <label className="block text-gray-700 font-medium mb-1">Reminder Date</label>
                 <input
                   type="date"
                   className="w-full border p-2 rounded-lg"
                   value={editForm.reminderDate || ""}
-                  onChange={(e) => setEditForm({ ...editForm, reminderDate: e.target.value })}
+                  onChange={(e) => setEditForm({ ...editForm, reminderDate: new Date(e.target.value) })}
                 />
-              </div>
+              </div> */}
             </div>
 
             <div className="flex justify-end gap-4 mt-6">
