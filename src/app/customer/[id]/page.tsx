@@ -134,7 +134,7 @@ export default async function CustomerPage({
 
               {!isReminderDue(customer) && isReminderWithin3Days(customer) && (
                 <Badge variant="secondary" className="px-3 py-1 text-sm font-semibold bg-yellow-400 text-black shadow-sm">
-                  Upcoming Reminder
+                  Increment Soon
                 </Badge>
               )}
 
