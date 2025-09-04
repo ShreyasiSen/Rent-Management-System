@@ -178,26 +178,7 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
               <h2 className="text-2xl md:text-3xl font-bold text-purple-900 flex-1">
                 {customer.name}
               </h2>
-
               <div className="flex items-center gap-4">
-                {isReminderDue(customer) && (
-                  <Badge variant="destructive" className="px-3 py-1 text-sm font-semibold bg-red-500 text-white shadow-sm">
-                    Reminder Due
-                  </Badge>
-                )}
-
-                {!isReminderDue(customer) && isReminderWithin3Days(customer) && (
-                  <Badge variant="secondary" className="px-3 py-1 text-sm font-semibold bg-yellow-400 text-black shadow-sm">
-                    Upcoming Reminder
-                  </Badge>
-                )}
-
-                {isIncrementToday(customer) && (
-                  <Badge className="px-3 py-1 text-sm font-semibold bg-green-500 text-white shadow-sm">
-                    Today is Increment Day
-                  </Badge>
-                )}
-
                 {/* Edit button */}
                 <Button
                   variant="ghost"
@@ -226,6 +207,25 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
                   <Trash2 className="h-8 w-8 text-red-600" />
                 </Button>
               </div>
+            </div>
+            <div className="mt-1 flex items-center gap-4">
+              {isReminderDue(customer) && (
+                  <Badge variant="destructive" className="px-3 py-1 text-sm font-semibold bg-red-500 text-white shadow-sm">
+                    Reminder Due
+                  </Badge>
+                )}
+
+                {!isReminderDue(customer) && isReminderWithin3Days(customer) && (
+                  <Badge variant="secondary" className="px-3 py-1 text-sm font-semibold bg-yellow-400 text-black shadow-sm">
+                    Upcoming Reminder
+                  </Badge>
+                )}
+
+                {isIncrementToday(customer) && (
+                  <Badge className="px-3 py-1 text-sm font-semibold bg-green-500 text-white shadow-sm">
+                    Today is Increment Day
+                  </Badge>
+                )}
             </div>
 
             <div className="mt-6 grid grid-cols-2 md:grid-cols-6 gap-6 bg-gray-50 p-4 rounded-2xl">
@@ -259,8 +259,8 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
                   {calculateReminderDate(customer)}
                 </p>
               </div>
-
             </div>
+            
           </CardContent>
 
           <div className="absolute inset-0 bg-gradient-to-r from-purple-50 via-pink-50 to-indigo-50 opacity-0 group-hover:opacity-20 transition-opacity rounded-3xl pointer-events-none"></div>
