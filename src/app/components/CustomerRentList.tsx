@@ -15,7 +15,7 @@ interface Customer {
   phoneNumber: string;
   address: string;
   aadharNumber: string;
-  yearsOfEngagement: number;
+  yearOfEngagement: string;
   advancedMoney: number;
   startingRent: number;
   currentRent: number;
@@ -367,9 +367,9 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
                 <input
                   // type="number"
                   className="w-full border p-2 rounded-lg"
-                  value={editForm.yearsOfEngagement || ""}
+                  value={editForm.yearOfEngagement || ""}
                   onChange={(e) =>
-                    setEditForm({ ...editForm, yearsOfEngagement: Number(e.target.value) })
+                    setEditForm({ ...editForm, yearOfEngagement: e.target.value })
                   }
                   placeholder="Engagement Year"
                 />

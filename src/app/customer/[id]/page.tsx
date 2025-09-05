@@ -31,7 +31,7 @@ type CustomerType = {
   previousIncrementDate: string; // 👈 string instead of Date
   startingRent: number;
   increasePercentage: number;
-  yearsOfEngagement: number;
+  yearOfEngagement: string;
   yearsUntilIncrease: number;
   reminderDate: string;          // 👈 string instead of Date
   __v: number;
@@ -278,7 +278,7 @@ export default async function CustomerPage({
                   Starting Year of Engagement
                 </p>
                 <p className="text-xl font-semibold text-gray-900">
-                  Year {customer.yearsOfEngagement}
+                   {customer.yearOfEngagement}
                 </p>
               </div>
               <div>

@@ -30,7 +30,7 @@ const customerSchema = z.object({
   address: z.string().min(1, "Address must be at least 1 character"),
   aadharNumber: z.string().min(0, ""),
   startingRent: z.string().min(0, ""),
-  yearsOfEngagement: z.string().min(0, "Years of engagement must be positive"),
+  yearOfEngagement: z.string().min(0, "Years of engagement must be positive"),
   advancedMoney: z.string().min(0, "Advanced money must be positive"),
   currentRent: z.string().min(0, "Rent must be positive"),
   increasePercentage: z
@@ -58,7 +58,7 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
       phoneNumber: "",
       address: "",
       aadharNumber: "",
-      yearsOfEngagement: "",
+      yearOfEngagement: "",
       startingRent: "",
       advancedMoney: "",
       currentRent: "",
@@ -69,31 +69,31 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
     },
   });
 
- const onSubmit = async (data: CustomerFormData) => {
-  try {
-    const res = await fetch("/api/customers", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
+  const onSubmit = async (data: CustomerFormData) => {
+    try {
+      const res = await fetch("/api/customers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
 
-    if (!res.ok) throw new Error("Failed to save customer");
+      if (!res.ok) throw new Error("Failed to save customer");
 
-    const savedCustomer = await res.json();
+      const savedCustomer = await res.json();
 
-    onCustomerAdded(savedCustomer); // pass saved customer back
-    form.reset();
+      onCustomerAdded(savedCustomer); // pass saved customer back
+      form.reset();
 
-    toast.success("Customer Added", {
-      description: `${savedCustomer.name} has been added successfully.`,
-    });
-  } catch (error) {
-    console.error(error);
-    toast.error("❌ Failed to add customer", {
-      description: "Something went wrong. Please try again.",
-    });
-  }
-};
+      toast.success("Customer Added", {
+        description: `${savedCustomer.name} has been added successfully.`,
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error("❌ Failed to add customer", {
+        description: "Something went wrong. Please try again.",
+      });
+    }
+  };
 
 
   return (
@@ -203,22 +203,17 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
             <div className="space-y-8">
               <FormField
                 control={form.control}
-                name="yearsOfEngagement"
+                name="yearOfEngagement"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-lg font-medium text-gray-600">Engagement Year</FormLabel>
+                    <FormLabel>Engagement Year</FormLabel>
                     <FormControl>
                       <Input
-                        // type="number"
+                        type="text"   
                         placeholder="Type the engagement year"
                         {...field}
-                        // onChange={(e) => field.onChange(Number(e.target.value))}
-                        className="h-12 rounded-lg border-gray-200 bg-white/70 backdrop-blur-sm 
-                               focus:border-blue-600 focus:ring-2 focus:ring-blue-400/50 
-                               transition-all shadow-sm text-gray-900"
                       />
                     </FormControl>
-                    <FormMessage className="text-sm text-red-500" />
                   </FormItem>
                 )}
               />
@@ -244,26 +239,26 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
                 )}
               />
 
-            <FormField
-              control={form.control}
-              name="startingRent"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-lg font-medium text-gray-600">Starting Rent (₹)</FormLabel>
-                  <FormControl>
-                    <Input
-                      // type="number"
-                      placeholder="Type amount"
-                      {...field}
-                      className="h-12 rounded-lg border-gray-200 bg-white/70 backdrop-blur-sm 
+              <FormField
+                control={form.control}
+                name="startingRent"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-lg font-medium text-gray-600">Starting Rent (₹)</FormLabel>
+                    <FormControl>
+                      <Input
+                        // type="number"
+                        placeholder="Type amount"
+                        {...field}
+                        className="h-12 rounded-lg border-gray-200 bg-white/70 backdrop-blur-sm 
                              focus:border-blue-600 focus:ring-2 focus:ring-blue-400/50 
                              transition-all shadow-sm text-gray-900"
-                    />
-                  </FormControl>
-                  <FormMessage className="text-sm text-red-500" />
-                </FormItem>
-              )}
-            /> 
+                      />
+                    </FormControl>
+                    <FormMessage className="text-sm text-red-500" />
+                  </FormItem>
+                )}
+              />
 
               <FormField
                 control={form.control}
@@ -382,7 +377,7 @@ export const CustomerRentForm: React.FC<CustomerRentFormProps> = ({
               >
                 Add Customer
               </Button>
-               <Toaster />
+              <Toaster />
             </div>
           </form>
         </Form>

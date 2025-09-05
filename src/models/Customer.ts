@@ -6,7 +6,7 @@ const customerSchema = new Schema(
     phoneNumber: { type: String, required: false },
     address: { type: String, required: false },
     aadharNumber: { type: String, required: false },
-    // yearsOfEngagement: { type: Number, required: false },
+    yearOfEngagement: { type: String, required: false },
     advancedMoney: { type: Number, required: false },
     startingRent: { type: Number, required: false },   // ✅
     currentRent: { type: Number, required: false },
