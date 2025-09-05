@@ -141,24 +141,8 @@ export default async function CustomerPage({
             Back to Customers
           </Link>
         </Button>
-
-        {/* Customer Card */}
-        <Card className="rounded-3xl shadow-xl border border-gray-200 hover:shadow-2xl transition-all">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-2xl md:text-3xl flex items-center gap-2 font-bold text-gray-900">
-                <User className="h-6 w-6 text-purple-600" />
-                {customer.name}
-              </CardTitle>
-              {/* <Button
-                variant="outline"
-                className="flex items-center gap-2 text-purple-700 hover:text-purple-900 font-semibold px-4 py-2 rounded-xl shadow-sm hover:shadow-md transition"
-              >
-                <Bell className="h-5 w-5" />
-                Send Reminder
-              </Button> */}
-
-              {/* Reminder Badge */}
+        <div>
+          {/* Reminder Badge */}
               {isReminderDue(customer) && (
                 <Badge variant="destructive" className="px-3 py-1 text-sm font-semibold bg-red-500 text-white shadow-sm">
                   Reminder Due
@@ -176,6 +160,23 @@ export default async function CustomerPage({
                   Today is Increment Day
                 </Badge>
               )}
+        </div>
+        
+        {/* Customer Card */}
+        <Card className="rounded-3xl shadow-xl border border-gray-200 hover:shadow-2xl transition-all">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-2xl md:text-3xl flex items-center gap-2 font-bold text-gray-900">
+                <User className="h-6 w-6 text-purple-600" />
+                {customer.name}
+              </CardTitle>
+              {/* <Button
+                variant="outline"
+                className="flex items-center gap-2 text-purple-700 hover:text-purple-900 font-semibold px-4 py-2 rounded-xl shadow-sm hover:shadow-md transition"
+              >
+                <Bell className="h-5 w-5" />
+                Send Reminder
+              </Button> */}
             </div>
           </CardHeader>
 
