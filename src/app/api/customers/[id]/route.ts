@@ -64,10 +64,6 @@ export async function PUT(
     { new: true } // return updated doc
   );
 
-  // if (updatedCustomer) {
-  //   await CustomerBackup.create({ ...body, originalId: params.id });
-  // }
-
   await CustomerBackup.findByIdAndUpdate(
     id,
     { $set: body },

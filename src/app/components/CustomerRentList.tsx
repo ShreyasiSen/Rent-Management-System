@@ -7,6 +7,7 @@ import { Trash2, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRouter } from "next/navigation";
 import { ObjectId } from "mongoose";
+import { useEffect } from 'react';
 
 interface Customer {
   _id?: ObjectId;
@@ -47,7 +48,7 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
     currentRent + (currentRent * percentage / 100);
 
   // __define-ocg__
-  const calculateNextIncrement = (customer: Customer) => {
+  const calculateNextIncrement = async (customer: Customer) => {
     const nextIncrementDate = new Date(customer.previousIncrementDate);
     nextIncrementDate.setFullYear(
       nextIncrementDate.getFullYear() + customer.yearsUntilIncrease
@@ -60,15 +61,30 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
         customer.currentRent +
         (customer.currentRent * customer.increasePercentage) / 100;
 
-      return {
+      const updatedCustomer = {
         ...customer,
         currentRent: newRent,
-        previousIncrementDate: nextIncrementDate.toISOString(), // ✅ store as string
-        reminderDate: nextIncrementDate.toISOString(),          // ✅ store as string
+        previousIncrementDate: nextIncrementDate.toISOString(),
+        reminderDate: nextIncrementDate.toISOString(),
       };
+
+      // 🔥 Persist in backend DBs
+      try {
+        await fetch(`/api/customers/${customer._id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedCustomer),
+        });
+      } catch (err) {
+        console.error("Failed to update DB:", err);
+      }
+
+      return updatedCustomer;
     }
+
     return customer;
   };
+
 
   const isIncrementToday = (customer: Customer) => {
     const today = new Date();
@@ -144,13 +160,21 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
       toast("❌ Failed to update", { description: "Please try again." });
     }
   };
-  const processedCustomers = localCustomers
-    .map(c => calculateNextIncrement(c))
-    .sort((a, b) => {
-      const aToday = isIncrementToday(a) ? 0 : isReminderWithin3Days(a) ? 1 : 2;
-      const bToday = isIncrementToday(b) ? 0 : isReminderWithin3Days(b) ? 1 : 2;
-      return aToday - bToday;
-    });
+  const [processedCustomers, setProcessedCustomers] = useState<Customer[]>([]);
+
+  useEffect(() => {
+    const processCustomers = async () => {
+      const updated = await Promise.all(localCustomers.map(c => calculateNextIncrement(c)));
+      updated.sort((a, b) => {
+        const aToday = isIncrementToday(a) ? 0 : isReminderWithin3Days(a) ? 1 : 2;
+        const bToday = isIncrementToday(b) ? 0 : isReminderWithin3Days(b) ? 1 : 2;
+        return aToday - bToday;
+      });
+      setProcessedCustomers(updated);
+    };
+
+    processCustomers();
+  }, [localCustomers]);
 
 
   if (processedCustomers.length === 0) {
@@ -210,22 +234,22 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
             </div>
             <div className="mt-1 flex items-center gap-4">
               {isReminderDue(customer) && (
-                  <Badge variant="destructive" className="px-3 py-1 text-sm font-semibold bg-red-500 text-white shadow-sm">
-                    Reminder Due
-                  </Badge>
-                )}
+                <Badge variant="destructive" className="px-3 py-1 text-sm font-semibold bg-red-500 text-white shadow-sm">
+                  Reminder Due
+                </Badge>
+              )}
 
-                {!isReminderDue(customer) && isReminderWithin3Days(customer) && (
-                  <Badge variant="secondary" className="px-3 py-1 text-sm font-semibold bg-yellow-400 text-black shadow-sm">
-                    Increment Soon
-                  </Badge>
-                )}
+              {!isReminderDue(customer) && isReminderWithin3Days(customer) && (
+                <Badge variant="secondary" className="px-3 py-1 text-sm font-semibold bg-yellow-400 text-black shadow-sm">
+                  Increment Soon
+                </Badge>
+              )}
 
-                {isIncrementToday(customer) && (
-                  <Badge className="px-3 py-1 text-sm font-semibold bg-green-500 text-white shadow-sm">
-                    Today is Increment Day
-                  </Badge>
-                )}
+              {isIncrementToday(customer) && (
+                <Badge className="px-3 py-1 text-sm font-semibold bg-green-500 text-white shadow-sm">
+                  Today is Increment Day
+                </Badge>
+              )}
             </div>
 
             <div className="mt-6 grid grid-cols-2 md:grid-cols-6 gap-6 bg-gray-50 p-4 rounded-2xl">
@@ -242,7 +266,7 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
                 <p className="text-lg font-semibold text-gray-800">{customer.increasePercentage}%</p>
               </div>
               <div>
-                <p className="text-xl text-black ">New Rent</p>
+                <p className="text-xl text-black ">Next Rent</p>
                 <p className="text-lg font-bold text-purple-600">
                   ₹{calculateNewRent(customer.currentRent, customer.increasePercentage).toFixed(2)}
                 </p>
@@ -260,7 +284,7 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
                 </p>
               </div>
             </div>
-            
+
           </CardContent>
 
           <div className="absolute inset-0 bg-gradient-to-r from-purple-50 via-pink-50 to-indigo-50 opacity-0 group-hover:opacity-20 transition-opacity rounded-3xl pointer-events-none"></div>

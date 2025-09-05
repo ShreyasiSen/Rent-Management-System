@@ -51,11 +51,39 @@ export default async function CustomerPage({
   }
 
   const result = await Customer.findById(id).lean();
-  const customer: CustomerType | null =
+  const rawCustomer: CustomerType | null =
     result && !Array.isArray(result) ? (result as CustomerType) : null;
 
-  if (!customer) return notFound();
+  if (!rawCustomer) return notFound();
 
+  // ⬇️ Use your same increment logic here
+  const calculateNextIncrement = (customer: CustomerType) => {
+    const nextIncrementDate = new Date(customer.previousIncrementDate);
+    nextIncrementDate.setFullYear(
+      nextIncrementDate.getFullYear() + customer.yearsUntilIncrease
+    );
+
+    const today = new Date();
+
+    if (today >= nextIncrementDate) {
+      const newRent =
+        customer.currentRent +
+        (customer.currentRent * customer.increasePercentage) / 100;
+
+      return {
+        ...customer,
+        currentRent: newRent,
+        previousIncrementDate: nextIncrementDate.toISOString(), // store as string
+        reminderDate: nextIncrementDate.toISOString(),
+      };
+    }
+    return customer;
+  };
+
+  // ✅ Apply logic here so view always shows updated info
+  const customer = calculateNextIncrement(rawCustomer);
+
+  // helper for "new rent" preview (without updating currentRent yet)
   const calculateNewRent = (currentRent: number, percentage: number) => {
     return currentRent + (currentRent * percentage) / 100;
   };
@@ -217,7 +245,7 @@ export default async function CustomerPage({
                 </div>
                 <div>
                   <p className="text-gray-500 uppercase text-xs tracking-wide">
-                    New Rent
+                    Next Rent
                   </p>
                   <p className="text-xl font-semibold text-purple-600">
                     ₹
