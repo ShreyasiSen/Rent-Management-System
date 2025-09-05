@@ -68,7 +68,6 @@ export const CustomerRentList: React.FC<CustomerRentListProps> = ({
         reminderDate: nextIncrementDate.toISOString(),
       };
 
-      // 🔥 Persist in backend DBs
       try {
         await fetch(`/api/customers/${customer._id}`, {
           method: "PUT",

@@ -80,6 +80,11 @@ export default async function CustomerPage({
     return customer;
   };
 
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toISOString().split("T")[0];
+  };
+
   // ✅ Apply logic here so view always shows updated info
   const customer = calculateNextIncrement(rawCustomer);
 
@@ -285,10 +290,10 @@ export default async function CustomerPage({
               </div>
               <div>
                 <p className="text-gray-500 uppercase text-xs tracking-wide">
-                  Previous Increment Date
+                  Previous Increment Date (yyyy-mm-dd)
                 </p>
                 <p className="text-lg font-semibold text-gray-800">
-                  {new Date(customer.previousIncrementDate).toLocaleDateString()}
+                  {formatDate(customer.previousIncrementDate)}
                 </p>
               </div>
               {/* <div>
