@@ -10,7 +10,7 @@ interface Customer {
   phoneNumber: string;
   address: string;
   aadharNumber: string;
-  yearsOfEngagement: number;
+  yearOfEngagement: string;
   currentRent: number;
   increasePercentage: number;
   startingRent: number;
